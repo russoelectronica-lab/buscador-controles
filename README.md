@@ -31,9 +31,11 @@ secreta que solo está en Vercel. Por eso, a diferencia de tirasled, acá no hay
 2. Andá a **SQL Editor → New query**, pegá todo el contenido de `supabase/schema.sql` y tocá **Run**.
    Eso crea las tablas `modelos`, `reemplazos`, `usuarios` y `busquedas`, con los 4 modelos de ejemplo.
 3. Cargá tus clientes en la tabla **usuarios** (Table Editor → usuarios → Insert). Solo hace falta `dni` (solo números) y `nombre`.
-4. Andá a **Project Settings → API** y copiá:
-   - **Project URL** (ej. `https://abcd1234.supabase.co`)
-   - **service_role key** (la secreta). ⚠️ Esta clave no se pega nunca en un HTML ni se comparte.
+4. Copiá dos datos:
+   - **Project URL** (ej. `https://abcd1234.supabase.co`): botón **Connect** arriba, o **Project Settings → Data API**.
+   - **Clave secreta**: **Project Settings → API Keys**. Sirve cualquiera de las dos:
+     la **secret key** (`sb_secret_...`, pestaña *API Keys*) o la **service_role** (`eyJ...`, pestaña *Legacy API Keys*).
+     ⚠️ Esta clave no se pega nunca en un HTML ni se comparte. La *publishable* / *anon* **no** sirve.
 
 ### 2. Vercel
 1. En [vercel.com](https://vercel.com) → **Add New → Project** → importá el repo `controlados-app`.
