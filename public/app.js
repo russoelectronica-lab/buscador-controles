@@ -77,77 +77,177 @@ function pantallaInicio() {
   );
 }
 
+const MIN_CARACTERES = 4;
+const MAX_SUGERENCIAS = 8;
+const soloLetrasYNumeros = (t) => t.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+// Resalta en negrita la parte del modelo que coincide con lo escrito ("EA50X6100" con "50x6" -> EA<b>50X6</b>100).
+function resaltar(modelo, texto) {
+  const q = soloLetrasYNumeros(texto);
+  const posiciones = []; // posición en `modelo` de cada letra/número
+  [...modelo].forEach((ch, i) => { if (/[A-Z0-9]/i.test(ch)) posiciones.push(i); });
+  const desde = soloLetrasYNumeros(modelo).indexOf(q);
+  if (!q || desde < 0) return [modelo];
+  const a = posiciones[desde];
+  const b = posiciones[desde + q.length - 1] + 1;
+  return [modelo.slice(0, a), h('mark', {}, modelo.slice(a, b)), modelo.slice(b)];
+}
+
+function tarjetaResultado(r) {
+  return h('article', { class: 'resultado' },
+    h('p', { class: 'titulo' }, 'Control equivalente para ', h('b', {}, `${r.marca} ${r.modelo}`)),
+    h('a', { class: 'control-grande', href: `#control/${r.control.numero}` }, r.control.nombre),
+    lineaReemplazos(r.control),
+  );
+}
+
 function pantallaBuscar() {
   const input = h('input', {
     class: 'campo', type: 'search', id: 'buscador', autocomplete: 'off', autocapitalize: 'characters',
     spellcheck: 'false', placeholder: 'Ej: ea50x6100', 'aria-label': 'Modelo de TV o aire',
+    role: 'combobox', 'aria-autocomplete': 'list', 'aria-controls': 'sugerencias', 'aria-expanded': 'false',
   });
+  const sugerencias = h('ul', { class: 'sugerencias', id: 'sugerencias', role: 'listbox', hidden: true });
   const resultados = h('div', { class: 'resultados', 'aria-live': 'polite' });
 
+  let lista = [];          // resultados de la última búsqueda
+  let textoLista = '';     // texto con el que se buscó esa lista
+  let marcada = -1;        // sugerencia elegida con las flechas del teclado
   let temporizador = null;
   let temporizadorRegistro = null;
   let ultimaConsulta = 0;
+  let ultimoRegistrado = '';
 
-  async function buscar(registrar) {
-    const texto = input.value.trim();
-    if (texto.replace(/[^a-z0-9]/gi, '').length < 3) {
-      resultados.replaceChildren(texto ? h('p', { class: 'nota' }, 'Seguí escribiendo… (mínimo 3 letras o números)') : '');
+  // Guarda la búsqueda para las estadísticas (una sola vez por texto).
+  function registrar(texto) {
+    clearTimeout(temporizadorRegistro);
+    const q = soloLetrasYNumeros(texto);
+    if (q.length < MIN_CARACTERES || q === ultimoRegistrado) return;
+    ultimoRegistrado = q;
+    api(`/api/buscar?q=${encodeURIComponent(texto)}&registrar=1`).catch(() => {});
+  }
+
+  function cerrarSugerencias() {
+    sugerencias.hidden = true;
+    sugerencias.replaceChildren();
+    input.setAttribute('aria-expanded', 'false');
+    marcada = -1;
+  }
+
+  function sinResultados(texto) {
+    return h('div', { class: 'vacio' },
+      h('p', {}, `No encontramos el modelo "${texto}".`),
+      h('p', {}, 'Probá escribiendo solo una parte (por ejemplo "', texto.slice(0, 6), '"), o consultanos por ',
+        h('a', { href: `https://wa.me/543415851441?text=${encodeURIComponent(`Hola! Busco el control para el modelo ${texto}`)}` }, 'WhatsApp'),
+        '.'),
+    );
+  }
+
+  function pintarSugerencias() {
+    resultados.replaceChildren();
+    if (!lista.length) {
+      cerrarSugerencias();
+      resultados.replaceChildren(sinResultados(textoLista));
       return;
+    }
+    const items = lista.slice(0, MAX_SUGERENCIAS).map((r, i) =>
+      h('li', {
+        role: 'option', id: `sug-${i}`, 'aria-selected': String(i === marcada),
+        class: i === marcada ? 'marcada' : null,
+        // pointerdown en vez de click: así el teclado del celular no se cierra antes de elegir
+        onpointerdown: (e) => { e.preventDefault(); elegir(r); },
+      },
+        h('span', { class: 'sug-modelo' }, resaltar(r.modelo, textoLista)),
+        h('span', { class: 'sug-detalle' }, `${r.marca} · ${r.control.nombre}`),
+      ),
+    );
+    if (lista.length > MAX_SUGERENCIAS) {
+      items.push(h('li', { class: 'sug-todos', onpointerdown: (e) => { e.preventDefault(); verTodos(); } },
+        `Ver los ${lista.length} resultados`));
+    }
+    sugerencias.replaceChildren(...items);
+    sugerencias.hidden = false;
+    input.setAttribute('aria-expanded', 'true');
+    input.setAttribute('aria-activedescendant', marcada >= 0 ? `sug-${marcada}` : '');
+  }
+
+  function elegir(r) {
+    input.value = r.modelo;
+    registrar(textoLista);
+    cerrarSugerencias();
+    resultados.replaceChildren(tarjetaResultado(r));
+    input.blur(); // cierra el teclado del celular
+  }
+
+  function verTodos() {
+    registrar(textoLista);
+    cerrarSugerencias();
+    resultados.replaceChildren(...(lista.length ? lista.map(tarjetaResultado) : [sinResultados(textoLista)]));
+    input.blur();
+  }
+
+  async function buscar() {
+    const texto = input.value.trim();
+    const faltan = MIN_CARACTERES - soloLetrasYNumeros(texto).length;
+    if (faltan > 0) {
+      ++ultimaConsulta;
+      lista = [];
+      cerrarSugerencias();
+      resultados.replaceChildren(texto ? h('p', { class: 'nota' }, `Seguí escribiendo… (${faltan === 1 ? 'falta 1 letra o número' : `faltan ${faltan} letras o números`})`) : '');
+      return false;
     }
     const consulta = ++ultimaConsulta;
     try {
-      const datos = await api(`/api/buscar?q=${encodeURIComponent(texto)}${registrar ? '&registrar=1' : ''}`);
-      if (consulta !== ultimaConsulta) return; // llegó tarde una búsqueda vieja
-      pintarResultados(datos.resultados, texto);
+      const datos = await api(`/api/buscar?q=${encodeURIComponent(texto)}`);
+      if (consulta !== ultimaConsulta) return false; // llegó tarde una búsqueda vieja
+      lista = datos.resultados;
+      textoLista = texto;
+      marcada = -1;
+      pintarSugerencias();
+      return true;
     } catch {
-      if (consulta === ultimaConsulta) resultados.replaceChildren(errorCarga());
+      if (consulta === ultimaConsulta) {
+        cerrarSugerencias();
+        resultados.replaceChildren(errorCarga());
+      }
+      return false;
     }
-  }
-
-  function pintarResultados(lista, texto) {
-    if (!lista.length) {
-      resultados.replaceChildren(
-        h('div', { class: 'vacio' },
-          h('p', {}, `No encontramos el modelo "${texto}".`),
-          h('p', {}, 'Probá escribiendo solo una parte (por ejemplo "', texto.slice(0, 6), '"), o consultanos por ',
-            h('a', { href: `https://wa.me/543415851441?text=${encodeURIComponent(`Hola! Busco el control para el modelo ${texto}`)}` }, 'WhatsApp'),
-            '.'),
-        ),
-      );
-      return;
-    }
-    resultados.replaceChildren(
-      ...lista.map((r) =>
-        h('article', { class: 'resultado' },
-          h('p', { class: 'titulo' }, 'Control equivalente para ', h('b', {}, `${r.marca} ${r.modelo}`)),
-          h('a', { class: 'control-grande', href: `#control/${r.control.numero}` }, r.control.nombre),
-          lineaReemplazos(r.control),
-        ),
-      ),
-    );
   }
 
   input.addEventListener('input', () => {
     clearTimeout(temporizador);
     clearTimeout(temporizadorRegistro);
-    temporizador = setTimeout(() => buscar(false), 350);
+    temporizador = setTimeout(buscar, 250);
     // Si deja de escribir 2 segundos, guardamos la búsqueda (para estadísticas).
-    temporizadorRegistro = setTimeout(() => buscar(true), 2000);
+    temporizadorRegistro = setTimeout(() => registrar(input.value.trim()), 2000);
   });
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
+
+  input.addEventListener('keydown', async (e) => {
+    const visibles = Math.min(lista.length, MAX_SUGERENCIAS);
+    if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && !sugerencias.hidden && visibles) {
+      e.preventDefault();
+      marcada = e.key === 'ArrowDown' ? (marcada + 1) % visibles : (marcada - 1 + visibles) % visibles;
+      pintarSugerencias();
+    } else if (e.key === 'Escape') {
+      cerrarSugerencias();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
       clearTimeout(temporizador);
-      clearTimeout(temporizadorRegistro);
-      buscar(true);
-      input.blur(); // cierra el teclado del celular
+      if (marcada >= 0 && !sugerencias.hidden) return elegir(lista[marcada]);
+      // Si todavía no llegó la búsqueda de lo último que escribió, la hacemos ahora.
+      if (input.value.trim() !== textoLista && !(await buscar())) return;
+      verTodos();
     }
   });
+
+  input.addEventListener('blur', () => setTimeout(cerrarSugerencias, 150));
+  input.addEventListener('focus', () => { if (lista.length && input.value.trim() === textoLista) pintarSugerencias(); });
 
   mostrar(
     volver(),
     h('h1', {}, 'Buscar por modelo'),
-    h('p', { class: 'nota' }, 'Escribí solo el modelo, no hace falta la marca. Da igual mayúsculas, espacios o guiones.'),
-    input,
+    h('p', { class: 'nota' }, 'Escribí el modelo (desde 4 letras o números) y elegí de la lista. No hace falta la marca; da igual mayúsculas, espacios o guiones.'),
+    h('div', { class: 'buscador' }, input, sugerencias),
     resultados,
   );
   input.focus();

@@ -52,7 +52,7 @@ test('busca el modelo exacto y devuelve control y reemplazos', () => {
 });
 
 test('encuentra coincidencias parciales', () => {
-  assert.deepEqual(buscarModelo(catalogo, '32l').map((r) => r.modelo), ['32LF565B']);
+  assert.deepEqual(buscarModelo(catalogo, '32lf').map((r) => r.modelo), ['32LF565B']);
   assert.deepEqual(buscarModelo(catalogo, 'msy12').map((r) => r.control.nombre), ['AR 812']);
 });
 
@@ -61,9 +61,21 @@ test('encuentra el modelo aunque el cliente escriba un sufijo de más', () => {
   assert.equal(r.modelo, 'UN43J5320');
 });
 
-test('no busca con menos de 3 caracteres', () => {
-  assert.deepEqual(buscarModelo(catalogo, 'ea'), []);
+test('no busca con menos de 4 caracteres', () => {
+  assert.deepEqual(buscarModelo(catalogo, 'ea5'), []);
   assert.deepEqual(buscarModelo(catalogo, '- -'), []);
+});
+
+test('para el predictivo, primero los modelos que empiezan con lo escrito', () => {
+  const cat = armarCatalogo(
+    [
+      { marca: 'X', modelo: 'AB32LF', control: 401 },
+      { marca: 'LG', modelo: '32LF565B', control: 477 },
+      { marca: 'LG', modelo: '32LF550', control: 477 },
+    ],
+    [],
+  );
+  assert.deepEqual(buscarModelo(cat, '32lf').map((r) => r.modelo), ['32LF550', '32LF565B', 'AB32LF']);
 });
 
 test('los reemplazos van en un solo sentido', () => {

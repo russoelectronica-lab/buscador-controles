@@ -184,6 +184,35 @@ h2 { font-size: 1.3rem; margin: 20px 0 10px; }
   color: var(--texto-suave);
 }
 
+/* ---------- Predictivo ---------- */
+.buscador { position: relative; }
+.sugerencias {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 4px 0;
+  background: var(--tarjeta);
+  border: 2px solid var(--azul);
+  border-radius: var(--radio);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+.sugerencias li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2px 12px;
+  min-height: 52px;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--borde);
+}
+.sugerencias li:last-child { border-bottom: none; }
+.sugerencias li:hover, .sugerencias li.marcada { background: #e8f0fb; }
+.sug-modelo { font-size: 1.15rem; font-weight: 500; overflow-wrap: anywhere; }
+.sug-modelo mark { background: var(--resaltado); color: inherit; font-weight: 700; border-radius: 3px; }
+.sug-detalle { color: var(--texto-suave); font-size: 0.95rem; }
+.sugerencias li.sug-todos { justify-content: center; color: var(--azul); font-weight: 700; }
+
 /* ---------- Catálogo ---------- */
 .pestanas { display: flex; gap: 8px; margin-bottom: 12px; }
 .pestanas button {
