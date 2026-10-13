@@ -92,6 +92,16 @@ function primerNombre(nombre) {
   return primero.charAt(0).toUpperCase() + primero.slice(1).toLowerCase();
 }
 
+// "← Volver al inicio" arriba de cada sección.
+function volverAlInicio() {
+  return h('a', { class: 'volver', href: '#inicio' }, icono('izquierda'), 'Volver al inicio');
+}
+
+// Botón grande al final de las listas largas, para no tener que subir.
+function volverAlInicioAbajo() {
+  return h('div', { class: 'pie-seccion' }, h('a', { class: 'boton claro ancho', href: '#inicio' }, icono('inicio'), 'Volver al inicio'));
+}
+
 function titulo(texto, nota) {
   return nota ? [h('h1', {}, texto), h('p', { class: 'nota' }, nota)] : [h('h1', {}, texto)];
 }
@@ -438,6 +448,7 @@ function pantallaBuscar() {
   });
 
   mostrar(
+    volverAlInicio(),
     ...titulo('Buscar por modelo'),
     h('div', { class: 'caja-busqueda' }, icono('buscar'), input, girando, limpiar),
     h('p', { class: 'ayuda-busqueda' }, 'Escribí el modelo, sin la marca. Desde 4 letras o números.'),
@@ -451,7 +462,7 @@ function pantallaBuscar() {
 // ---------- Catálogo ----------
 
 async function pantallaCatalogo() {
-  const encabezado = titulo('Catálogo de controles', 'Tocá un control para verlo grande y ver sus reemplazos.');
+  const encabezado = [volverAlInicio(), ...titulo('Catálogo de controles', 'Tocá un control para verlo grande y ver sus reemplazos.')];
   mostrar(...encabezado, esqueletoGrilla());
   let controles;
   try {
@@ -499,14 +510,14 @@ async function pantallaCatalogo() {
   }
 
   filtro.addEventListener('input', pintar);
-  mostrar(...encabezado, pestanas, h('div', { class: 'filtro' }, icono('buscar'), filtro), contador, grilla);
+  mostrar(...encabezado, pestanas, h('div', { class: 'filtro' }, icono('buscar'), filtro), contador, grilla, volverAlInicioAbajo());
   pintar();
 }
 
 // ---------- Reemplazos ----------
 
 async function pantallaReemplazos() {
-  const encabezado = titulo('Reemplazos', 'Tocá un control para ver con cuáles se puede reemplazar.');
+  const encabezado = [volverAlInicio(), ...titulo('Reemplazos', 'Tocá un control para ver con cuáles se puede reemplazar.')];
   mostrar(...encabezado, h('div', { class: 'lista-reemplazos' }, Array.from({ length: 5 }, () => h('div', { class: 'esqueleto fila' }))));
   let controles;
   try {
@@ -550,7 +561,7 @@ async function pantallaReemplazos() {
   }
 
   filtro.addEventListener('input', pintar);
-  mostrar(...encabezado, h('div', { class: 'filtro' }, icono('buscar'), filtro), lista);
+  mostrar(...encabezado, h('div', { class: 'filtro' }, icono('buscar'), filtro), lista, volverAlInicioAbajo());
   pintar();
 }
 

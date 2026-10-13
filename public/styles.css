@@ -204,6 +204,8 @@ h2 { font-size: 1.15rem; margin: 22px 0 10px; }
   font-size: 1rem;
   cursor: pointer;
 }
+a.volver { text-decoration: none; }
+.pie-seccion { margin-top: 24px; }
 
 /* ============ Login ============ */
 .pagina-login {
