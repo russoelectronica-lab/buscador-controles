@@ -75,6 +75,21 @@ Los cambios en el catálogo aparecen en la app en menos de un minuto.
 Mientras un control no tenga foto, la app muestra un recuadro con el número y "Foto próximamente".
 Consejo: fotos cuadradas, fondo blanco, de unos 800×800 px y menos de 200 KB, así cargan rápido en el celular.
 
+## Velocidad
+
+- Al escribir 4 letras o números se hace **un solo pedido** al servidor; las letras siguientes se
+  filtran en el celular al instante (salvo que haya más de 300 coincidencias).
+- El servidor guarda en memoria el catálogo (se renueva solo cada minuto) y las sesiones ya verificadas (15 segundos).
+- **Región**: para que cada pedido tarde lo menos posible, Vercel y Supabase tienen que estar en la misma región.
+  Mirá la región de Supabase en **Project Settings → General** (por ejemplo *South America (São Paulo)*) y elegí
+  la misma en Vercel: **Settings → Functions → Function Region** (São Paulo es `gru1`). Después, **Redeploy**.
+
+## Instalar en el celular
+
+La app se puede agregar a la pantalla de inicio como si fuera una app:
+- **Android (Chrome)**: menú ⋮ → *Agregar a la pantalla principal*.
+- **iPhone (Safari)**: botón compartir → *Agregar a inicio*.
+
 ## Administración diaria
 
 - **Cortar el acceso a un cliente**: en `usuarios`, poner `activo` en `false`.

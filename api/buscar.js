@@ -11,15 +11,16 @@ export default manejar(async (req, res) => {
     return responder(res, 400, { error: 'busqueda_corta', minimo: MIN_CARACTERES_BUSQUEDA });
   }
 
-  const resultados = buscarModelo(await obtenerCatalogo(), texto);
+  const { resultados, completo } = buscarModelo(await obtenerCatalogo(), texto);
 
   // Guardamos solo búsquedas "terminadas" (las que pide la pantalla al dejar de escribir),
-  // para ver qué modelos busca la gente y cuáles faltan cargar.
+  // para ver qué modelos busca la gente y cuáles faltan cargar. Esas no necesitan resultados.
   if (parametros(req).get('registrar') === '1') {
     await registrarBusqueda(usuario.dni, texto, resultados.length).catch((err) =>
       console.error('No se pudo registrar la búsqueda:', err),
     );
+    return responder(res, 200, { ok: true });
   }
 
-  responder(res, 200, { resultados });
+  responder(res, 200, { resultados, completo });
 });

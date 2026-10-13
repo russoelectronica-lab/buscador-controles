@@ -19,6 +19,7 @@ const TIPOS = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.webp': 'image/webp',
+  '.webmanifest': 'application/manifest+json',
 };
 
 createServer(async (req, res) => {

@@ -1,10 +1,14 @@
+import { icono } from '/iconos.js';
+
+for (const el of document.querySelectorAll('[data-icono]')) el.append(icono(el.dataset.icono));
+
 const form = document.getElementById('formLogin');
 const inputDni = document.getElementById('dni');
 const boton = document.getElementById('botonIngresar');
 const mensaje = document.getElementById('mensaje');
 
 const ERRORES = {
-  dni_invalido: 'Revisá el DNI: tiene que tener entre 6 y 9 números.',
+  dni_invalido: 'Revisá el DNI: tiene que tener entre 6 y 9 números, sin puntos.',
   dni_no_registrado: 'Ese DNI no está habilitado. Escribinos por WhatsApp para pedir acceso.',
   usuario_inactivo: 'Tu acceso está pausado. Escribinos por WhatsApp.',
 };

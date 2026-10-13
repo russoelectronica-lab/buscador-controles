@@ -2,27 +2,61 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Buscador de Controles - RUSSO Electrónica</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#0057b8">
+  <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icono-180.png">
+  <meta name="apple-mobile-web-app-title" content="Controles">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
+  <link rel="modulepreload" href="/busqueda.js">
+  <link rel="modulepreload" href="/iconos.js">
 </head>
 <body>
-  <div class="encabezado">
-    <strong>RUSSO Electrónica</strong> &nbsp;|&nbsp; Santiago 3462, Rosario<br>
-    WhatsApp: <a href="https://wa.me/543415851441">3415851441</a>
-  </div>
+  <header class="topbar">
+    <div class="topbar-contenido">
+      <a class="marca" href="#inicio" aria-label="Inicio">
+        <span class="logo" data-icono="control"></span>
+        <span class="marca-texto">
+          <strong>RUSSO Electrónica</strong>
+          <small id="usuario">Buscador de controles</small>
+        </span>
+      </a>
+      <button class="boton-salir" id="botonSalir" type="button">
+        <span data-icono="salir"></span><span>Salir</span>
+      </button>
+    </div>
+  </header>
 
-  <div class="barra">
-    <span class="usuario" id="usuario"></span>
-    <button class="boton secundario chico" id="botonSalir" type="button">Salir</button>
-  </div>
+  <nav class="tabbar" aria-label="Secciones">
+    <a href="#inicio" data-ruta="inicio"><span class="icono-fondo" data-icono="inicio"></span>Inicio</a>
+    <a href="#buscar" data-ruta="buscar"><span class="icono-fondo" data-icono="buscar"></span>Buscar</a>
+    <a href="#catalogo" data-ruta="catalogo"><span class="icono-fondo" data-icono="catalogo"></span>Catálogo</a>
+    <a href="#reemplazos" data-ruta="reemplazos"><span class="icono-fondo" data-icono="reemplazos"></span>Reemplazos</a>
+  </nav>
 
   <main class="contenedor" id="vista">
-    <p class="cargando">Cargando…</p>
+    <div class="esqueleto titulo"></div>
+    <div class="esqueleto fila"></div>
   </main>
 
-  <script src="/app.js"></script>
+  <footer class="pie">
+    RUSSO Electrónica · Santiago 3462, Rosario · WhatsApp <a href="https://wa.me/543415851441">3415851441</a>
+  </footer>
+
+  <dialog class="visor" id="visor" aria-label="Foto ampliada">
+    <div class="visor-contenido">
+      <div class="visor-barra">
+        <span id="visorTitulo"></span>
+        <button type="button" id="visorCerrar" aria-label="Cerrar"><span data-icono="cerrar"></span></button>
+      </div>
+      <img id="visorImagen" alt="">
+    </div>
+  </dialog>
+
+  <script type="module" src="/app.js"></script>
 </body>
 </html>

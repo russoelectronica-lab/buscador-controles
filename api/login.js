@@ -1,5 +1,5 @@
 import { buscarUsuarioPorDni, guardarSesion } from '../lib/db.js';
-import { leerJson, manejar, nuevaSesion, ponerCookieSesion, responder } from '../lib/http.js';
+import { leerJson, manejar, nuevaSesion, olvidarSesionesDe, ponerCookieSesion, responder } from '../lib/http.js';
 
 export default manejar(async (req, res) => {
   if (req.method !== 'POST') return responder(res, 405, { error: 'metodo_no_permitido' });
@@ -15,6 +15,7 @@ export default manejar(async (req, res) => {
 
   const sesion = nuevaSesion();
   await guardarSesion(dni, sesion.hash);
+  olvidarSesionesDe(dni);
   ponerCookieSesion(req, res, sesion.token);
   responder(res, 200, { nombre: usuario.nombre });
 });
