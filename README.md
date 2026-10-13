@@ -6,8 +6,9 @@ acondicionado, vean el catálogo y los reemplazos de cada control.
 - **Login con DNI**, una sola sesión por cliente: si entra desde otro dispositivo, la sesión anterior se cierra.
 - **Buscar por modelo**: escribís `ea50x6100` y muestra *Control equivalente para NOBLEX EA50X6100 → LCD 500 · Reemplazos: LCD 522, LCD 553*.
   No importan mayúsculas, espacios ni guiones, busca coincidencias parciales y encuentra el modelo aunque el cliente escriba letras de más al final.
-- **Catálogo**: controles LCD/LED/Smart (400–799) y aire acondicionado (800 en adelante).
-- **Reemplazos**: lista de controles; al tocar uno muestra sus equivalentes (en un solo sentido).
+- **Catálogo**: fotos de los controles LCD/LED/Smart (400–799) y de aire acondicionado (800 en adelante).
+  No muestra qué modelos usa cada control: esa info queda guardada solo para vos.
+- **Reemplazos**: lista de controles; al tocar uno muestra sus equivalentes (en un solo sentido), y cada equivalente abre su foto.
 - Guarda las búsquedas, para saber qué modelos piden y no están cargados.
 
 ## Cómo está armado
@@ -62,6 +63,18 @@ Excel lo guarda como el número decimal 522,553 y se pierde el dato.
 
 Los cambios en el catálogo aparecen en la app en menos de un minuto.
 
+## Fotos de los controles
+
+1. Una sola vez: en Supabase, **SQL Editor → New query**, pegá `supabase/fotos.sql` y **Run**.
+   Eso crea la carpeta pública `fotos` en **Storage**.
+2. Entrá a **Storage → fotos** y arrastrá las fotos. El nombre tiene que ser **solo el número** del control:
+   `500.jpg`, `812.webp`, `446.png` (sirven jpg, png y webp).
+3. Aparecen en la app en menos de un minuto. Para cambiar una foto, subí otra con el mismo nombre
+   (Supabase pregunta si querés reemplazarla).
+
+Mientras un control no tenga foto, la app muestra un recuadro con el número y "Foto próximamente".
+Consejo: fotos cuadradas, fondo blanco, de unos 800×800 px y menos de 200 KB, así cargan rápido en el celular.
+
 ## Administración diaria
 
 - **Cortar el acceso a un cliente**: en `usuarios`, poner `activo` en `false`.
@@ -77,10 +90,9 @@ npm run dev     # abre http://localhost:3000 — DNI de prueba: 11111111
 npm test        # pruebas de la búsqueda
 ```
 
-Sin variables de Supabase usa los datos de `data/demo.json`.
+Sin variables de Supabase usa los datos de `data/demo.json` y las fotos que pongas en `public/fotos/`.
 
 ## Próximos pasos
 
-- Fotos de los controles (`500.jpg`, `800.jpg`…) en la ficha de cada control.
 - PIN corto además del DNI, para cuando el servicio sea pago.
 - Panel de administración para cargar modelos sin pasar por Supabase.

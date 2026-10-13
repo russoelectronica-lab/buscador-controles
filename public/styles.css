@@ -229,23 +229,55 @@ h2 { font-size: 1.3rem; margin: 20px 0 10px; }
 
 .grilla {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 10px;
   margin-top: 12px;
 }
 .control-boton {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
   background: var(--tarjeta);
   border: 2px solid var(--borde);
   border-radius: var(--radio);
-  padding: 12px;
+  padding: 10px;
   text-align: center;
   text-decoration: none;
   color: var(--texto);
 }
 .control-boton:hover, .control-boton:focus-visible { border-color: var(--azul); outline: none; }
-.control-boton strong { display: block; font-size: 1.25rem; color: var(--azul); }
-.control-boton span { font-size: 0.85rem; color: var(--texto-suave); }
+.control-boton strong { font-size: 1.1rem; color: var(--azul); }
+
+/* ---------- Fotos ---------- */
+.foto {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 8px;
+}
+.sin-foto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: #eef2f7;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+}
+.sin-foto strong { font-size: 1.3rem; color: var(--azul); }
+.control-boton .sin-foto strong { display: none; } /* en la grilla el nombre ya va abajo */
+.foto-resultado { display: block; max-width: 260px; margin: 4px 0 10px; }
+.ficha {
+  background: var(--tarjeta);
+  border: 2px solid var(--azul);
+  border-radius: var(--radio);
+  padding: 16px;
+}
+.foto.grande { max-width: 520px; margin: 0 auto 14px; }
 
 /* ---------- Reemplazos (desplegables) ---------- */
 .lista-reemplazos { display: grid; gap: 8px; margin-top: 12px; }
@@ -269,21 +301,6 @@ h2 { font-size: 1.3rem; margin: 20px 0 10px; }
 .lista-reemplazos summary::after { content: "▸"; color: var(--azul); }
 .lista-reemplazos details[open] summary::after { content: "▾"; }
 .lista-reemplazos .cuerpo { padding: 0 16px 14px; }
-
-/* ---------- Detalle de control ---------- */
-.tabla-modelos {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--tarjeta);
-  border-radius: var(--radio);
-  overflow: hidden;
-}
-.tabla-modelos th, .tabla-modelos td {
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--borde);
-  text-align: left;
-}
-.tabla-modelos th { background: #e8f0fb; }
 
 .cargando { color: var(--texto-suave); padding: 12px 0; }
 

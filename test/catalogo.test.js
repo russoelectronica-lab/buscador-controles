@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   armarCatalogo,
+  numeroDeFoto,
   buscarModelo,
   detalleControl,
   listarControles,
@@ -23,6 +24,7 @@ const catalogo = armarCatalogo(
     { control: 446, reemplazos: '452' },
     { control: 520, reemplazos: '589' },
   ],
+  new Map([[500, '/fotos/500.jpg'], [522, '/fotos/522.webp'], [701, '/fotos/701.png']]),
 );
 
 test('normaliza modelos ignorando mayúsculas, espacios, guiones y puntos', () => {
@@ -83,11 +85,30 @@ test('los reemplazos van en un solo sentido', () => {
   assert.equal(detalleControl(catalogo, 500).reemplazos.length, 2);
 });
 
-test('lista todos los controles, incluidos los que solo aparecen como reemplazo', () => {
+test('lista todos los controles, incluidos los que solo aparecen como reemplazo o tienen foto', () => {
   const lista = listarControles(catalogo);
-  assert.deepEqual(lista.map((c) => c.numero), [446, 452, 477, 500, 520, 522, 553, 589, 812]);
-  assert.equal(lista.find((c) => c.numero === 500).cantidadModelos, 1);
-  assert.equal(lista.find((c) => c.numero === 553).cantidadModelos, 0);
+  assert.deepEqual(lista.map((c) => c.numero), [446, 452, 477, 500, 520, 522, 553, 589, 701, 812]);
+  assert.equal(lista.find((c) => c.numero === 500).foto, '/fotos/500.jpg');
+  assert.equal(lista.find((c) => c.numero === 553).foto, null);
+});
+
+test('el detalle y la lista no exponen los modelos que usa cada control', () => {
+  assert.equal('modelos' in detalleControl(catalogo, 500), false);
+  assert.equal('cantidadModelos' in listarControles(catalogo)[0], false);
+});
+
+test('los reemplazos y los resultados de búsqueda traen la foto si existe', () => {
+  const [r] = buscarModelo(catalogo, 'ea50x6100');
+  assert.equal(r.control.foto, '/fotos/500.jpg');
+  assert.deepEqual(r.control.reemplazos.map((x) => x.foto), ['/fotos/522.webp', null]);
+});
+
+test('reconoce fotos nombradas con el número del control', () => {
+  assert.equal(numeroDeFoto('500.jpg'), 500);
+  assert.equal(numeroDeFoto('800.WEBP'), 800);
+  assert.equal(numeroDeFoto('500.jpeg'), 500);
+  assert.equal(numeroDeFoto('control 500.jpg'), null);
+  assert.equal(numeroDeFoto('.emptyFolderPlaceholder'), null);
 });
 
 test('detalle de un control inexistente devuelve null', () => {

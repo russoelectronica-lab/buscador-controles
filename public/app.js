@@ -44,7 +44,19 @@ async function obtenerControles() {
 
 const volver = () => h('a', { class: 'volver', href: '#inicio' }, '← Volver al inicio');
 const linkControl = (c) => h('a', { class: 'chip', href: `#control/${c.numero}` }, c.nombre);
-const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
+
+// Foto del control, o un recuadro con el número si todavía no tiene foto cargada.
+function fotoControl(c, clase = '') {
+  const sinFoto = () =>
+    h('div', { class: `foto sin-foto ${clase}`, role: 'img', 'aria-label': `${c.nombre}, foto próximamente` },
+      h('strong', {}, c.nombre),
+      h('span', {}, 'Foto próximamente'),
+    );
+  if (!c.foto) return sinFoto();
+  const img = h('img', { class: `foto ${clase}`, src: c.foto, alt: `Control ${c.nombre}`, loading: 'lazy', decoding: 'async' });
+  img.addEventListener('error', () => img.replaceWith(sinFoto()));
+  return img;
+}
 
 function lineaReemplazos(control) {
   return h('p', { class: 'reemplazos-linea' },
@@ -97,6 +109,7 @@ function tarjetaResultado(r) {
   return h('article', { class: 'resultado' },
     h('p', { class: 'titulo' }, 'Control equivalente para ', h('b', {}, `${r.marca} ${r.modelo}`)),
     h('a', { class: 'control-grande', href: `#control/${r.control.numero}` }, r.control.nombre),
+    r.control.foto && h('a', { class: 'foto-resultado', href: `#control/${r.control.numero}` }, fotoControl(r.control)),
     lineaReemplazos(r.control),
   );
 }
@@ -288,9 +301,9 @@ async function pantallaCatalogo() {
     grilla.replaceChildren(
       ...(lista.length
         ? lista.map((c) =>
-            h('a', { class: 'control-boton', href: `#control/${c.numero}` },
+            h('a', { class: 'control-boton', href: `#control/${c.numero}`, 'aria-label': c.nombre },
+              fotoControl(c),
               h('strong', {}, c.nombre),
-              h('span', {}, plural(c.cantidadModelos, 'modelo', 'modelos')),
             ))
         : [h('p', { class: 'vacio' }, 'No hay controles para mostrar.')]),
     );
@@ -327,7 +340,7 @@ async function pantallaReemplazos() {
               h('div', { class: 'cuerpo' },
                 h('p', { class: 'nota' }, `El ${c.nombre} se puede reemplazar por:`),
                 h('p', {}, c.reemplazos.map(linkControl)),
-                h('a', { href: `#control/${c.numero}` }, `Ver modelos que usan el ${c.nombre}`),
+                h('p', { class: 'nota' }, 'Tocá un reemplazo para ver su foto.'),
               ),
             ))
         : [h('p', { class: 'vacio' }, 'No hay controles con reemplazos para ese número.')]),
@@ -354,17 +367,10 @@ async function pantallaControl(numero) {
     return mostrar(volver(), h('p', { class: 'vacio' }, `No encontramos el control ${numero}.`));
   }
 
-  const porMarca = h('table', { class: 'tabla-modelos' },
-    h('thead', {}, h('tr', {}, h('th', {}, 'Marca'), h('th', {}, 'Modelo'))),
-    h('tbody', {}, c.modelos.map((m) => h('tr', {}, h('td', {}, m.marca), h('td', {}, m.modelo)))),
-  );
-
   mostrar(
-    volver(),
+    h('a', { class: 'volver', href: '#', onclick: (e) => { e.preventDefault(); history.length > 1 ? history.back() : (location.hash = '#inicio'); } }, '← Volver'),
     h('h1', {}, c.nombre),
-    h('article', { class: 'resultado' }, lineaReemplazos(c)),
-    h('h2', {}, `Modelos que usan el ${c.nombre} (${c.modelos.length})`),
-    c.modelos.length ? porMarca : h('p', { class: 'vacio' }, 'Todavía no hay modelos cargados para este control.'),
+    h('div', { class: 'ficha' }, fotoControl(c, 'grande'), lineaReemplazos(c)),
   );
 }
 
