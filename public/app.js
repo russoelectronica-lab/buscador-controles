@@ -4,6 +4,7 @@
 import { filtrarModelos, MIN_CARACTERES_BUSQUEDA, normalizarModelo } from '/busqueda.js';
 import { icono } from '/iconos.js';
 
+// WhatsApp de contacto de Controlados (solo para "¿No encontrás un modelo? Escribinos").
 const WHATSAPP = '543415851441';
 const vista = document.getElementById('vista');
 let nombreCliente = '';
@@ -69,14 +70,23 @@ function botonWhatsapp(texto, mensaje, clase = '') {
     icono('whatsapp'), texto);
 }
 
-function mensajePedido(control, modelo) {
-  const saludo = nombreCliente ? `Hola! Soy ${nombreCliente}.` : 'Hola!';
-  return modelo
-    ? `${saludo} Quiero pedir el control ${control.nombre} (para ${modelo.marca} ${modelo.modelo}).`
-    : `${saludo} Quiero pedir el control ${control.nombre}.`;
+// Compartir con un colega: abre el menú de compartir del celular (WhatsApp, grupos...)
+// o, si el navegador no lo tiene, WhatsApp directo para elegir el contacto o grupo.
+function compartir(texto) {
+  const url = location.origin;
+  if (navigator.share) {
+    navigator.share({ title: 'Controlados', text: texto, url }).catch(() => {});
+  } else {
+    window.open(`https://wa.me/?text=${encodeURIComponent(`${texto} ${url}`)}`, '_blank', 'noopener');
+  }
 }
 
-// "LEONARDO NICOLAS RUSSO" -> "Leonardo"
+function botonCompartir(texto, clase = '') {
+  return h('button', { class: `boton compartir ${clase}`, type: 'button', onclick: () => compartir(texto) },
+    icono('compartir'), 'Compartir con un colega');
+}
+
+// "JUAN CARLOS PEREZ" -> "Juan"
 function primerNombre(nombre) {
   const primero = String(nombre ?? '').trim().split(/\s+/)[0] ?? '';
   return primero.charAt(0).toUpperCase() + primero.slice(1).toLowerCase();
@@ -161,7 +171,6 @@ function pantallaInicio() {
     h('div', { class: 'contacto' },
       h('div', {},
         h('p', {}, h('b', {}, '¿No encontrás un modelo?'), ' Escribinos y te ayudamos.'),
-        h('p', { class: 'dato' }, 'Santiago 3462, Rosario · 341 585-1441'),
       ),
       botonWhatsapp('Escribir por WhatsApp', nombreCliente ? `Hola! Soy ${nombreCliente}. ` : 'Hola! '),
     ),
@@ -198,7 +207,7 @@ function tarjetaResultado(r) {
       ),
     ),
     h('div', { class: 'acciones' },
-      botonWhatsapp('Pedir por WhatsApp', mensajePedido(c, r)),
+      botonCompartir(`El control para ${r.marca} ${r.modelo} es el ${c.nombre}. Lo encontré en Controlados, el buscador de controles remotos 👉`),
       h('a', { class: 'boton claro', href: `#control/${c.numero}` }, 'Ver ficha'),
     ),
   );
@@ -578,7 +587,7 @@ async function pantallaControl(numero) {
       c.reemplazos.length
         ? h('div', { class: 'mini-grilla' }, c.reemplazos.map(miniControl))
         : h('p', { class: 'sin-dato' }, 'Este control no tiene reemplazos cargados.'),
-      h('div', { class: 'acciones' }, botonWhatsapp('Pedir por WhatsApp', mensajePedido(c), 'ancho')),
+      h('div', { class: 'acciones' }, botonCompartir(`Mirá el control ${c.nombre} en Controlados, el buscador de controles remotos 👉`, 'ancho')),
     ),
   );
 }

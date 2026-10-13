@@ -1,4 +1,4 @@
-# Buscador de Controles — RUSSO Electrónica
+# Controlados — el buscador de controles remotos del rubro
 
 App web para que los clientes mayoristas busquen qué control remoto lleva cada TV o aire
 acondicionado, vean el catálogo y los reemplazos de cada control.

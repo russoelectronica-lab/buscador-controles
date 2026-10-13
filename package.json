@@ -2,7 +2,7 @@
   "name": "controlados-app",
   "version": "0.1.0",
   "private": true,
-  "description": "Buscador de controles remotos para clientes mayoristas de RUSSO Electrónica",
+  "description": "Controlados: el buscador de controles remotos del rubro (controlados.com.ar)",
   "type": "module",
   "scripts": {
     "dev": "node scripts/dev-server.js",

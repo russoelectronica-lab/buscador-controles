@@ -53,6 +53,6 @@ createServer(async (req, res) => {
     res.end('No encontrado');
   }
 }).listen(PUERTO, () => {
-  console.log(`Buscador de controles en http://localhost:${PUERTO}`);
+  console.log(`Controlados en http://localhost:${PUERTO}`);
   console.log(MODO_LOCAL ? 'Modo local: datos de data/demo.json (DNI de prueba 11111111)' : 'Usando Supabase');
 });

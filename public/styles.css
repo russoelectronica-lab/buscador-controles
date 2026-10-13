@@ -1,12 +1,16 @@
-/* Buscador de Controles — RUSSO Electrónica
-   Pensado primero para el celular: letra grande, botones grandes, contraste alto. */
+/* Controlados — el buscador de controles remotos del rubro (controlados.com.ar)
+   Pensado primero para el celular: letra grande, botones grandes, contraste alto.
+   Identidad: azul noche (--azul) + naranja (--naranja). */
 
 :root {
   color-scheme: light;
-  --azul: #0057b8;
-  --azul-oscuro: #00438f;
-  --azul-suave: #e8f0fb;
-  --azul-borde: #c7d9f2;
+  --azul: #1b2a4e;          /* azul noche: color principal */
+  --azul-oscuro: #111c36;
+  --azul-suave: #eaedf5;
+  --azul-borde: #cdd3e3;
+  --naranja: #ff7a1a;       /* acento: logo, íconos, detalles */
+  --naranja-boton: #e2600b; /* naranja con más contraste para botones con texto blanco */
+  --naranja-suave: #fff1e6;
   --fondo: #f2f4f7;
   --tarjeta: #ffffff;
   --texto: #16191d;
@@ -718,4 +722,30 @@ h2 { font-size: 1.15rem; margin: 22px 0 10px; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ============ Identidad Controlados ============ */
+.marca .logo, .login-cabecera .logo { background: var(--naranja); color: #fff; }
+.logo-texto { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.01em; }
+.logo-texto span, .logo-grande span { color: var(--naranja); }
+.login-cabecera .logo-grande { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 4px; }
+.pagina-login { background: linear-gradient(180deg, var(--azul) 0 250px, var(--fondo) 250px); }
+.login .boton { background: var(--naranja-boton); }
+.login .boton:hover { background: #c4520a; }
+
+.buscador-falso .icono, .caja-busqueda > .icono { color: var(--naranja); }
+.buscador-falso:hover { border-color: var(--naranja); }
+.tarjeta-menu .circulo { background: var(--naranja-suave); color: var(--naranja-boton); }
+.tarjeta-menu:hover { border-color: var(--naranja); }
+.tabbar a[aria-current="page"] .icono-fondo { background: var(--naranja-suave); color: var(--naranja-boton); }
+.campo:focus { border-color: var(--naranja); box-shadow: 0 0 0 4px rgba(255, 122, 26, 0.18); }
+.girando { border-color: var(--naranja-suave); border-top-color: var(--naranja); }
+.sugerencias { border-color: var(--azul-borde); }
+.control-boton:hover, .mini:hover, .lista-reemplazos details[open] { border-color: var(--naranja); }
+.boton.compartir { background: var(--azul-suave); color: var(--azul); }
+.boton.compartir:hover { background: #dde2ee; }
+:focus-visible { outline-color: rgba(255, 122, 26, 0.6); }
+
+@media (min-width: 900px) {
+  .tabbar a[aria-current="page"] { background: var(--naranja-suave); color: var(--azul); }
 }

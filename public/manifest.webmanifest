@@ -1,13 +1,13 @@
 {
-  "name": "Buscador de Controles - RUSSO Electrónica",
-  "short_name": "Controles",
+  "name": "Controlados · El buscador de controles remotos",
+  "short_name": "Controlados",
   "description": "Encontrá el control remoto de cada TV o aire acondicionado.",
   "lang": "es",
   "start_url": "/app",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f2f4f7",
-  "theme_color": "#0057b8",
+  "theme_color": "#1b2a4e",
   "icons": [
     { "src": "/icono-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icono-512.png", "sizes": "512x512", "type": "image/png" },
